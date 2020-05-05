@@ -99,12 +99,6 @@ function save_cpuprofile(filename, data, lidict)
             print(f, ":")
             JSON.print(f, Int[])
 
-            print(f, ",")
-
-            JSON.print(f, "hitCount")
-            print(f, ":")
-            JSON.print(f, 0)
-
             print(f, "}")
         end
         print(f, "]")
