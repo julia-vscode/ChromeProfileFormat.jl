@@ -10,7 +10,4 @@ foo()
 Profile.clear()
 @profile foo()
 
-data, lines = Profile.retrieve()
-data2, lines2 = Profile.flatten(data, lines)
-
-ChromeProfileFormat.save_cpuprofile("test.cpuprofile", data2, lines2)
+ChromeProfileFormat.save_cpuprofile("test.cpuprofile", from_c=true)
