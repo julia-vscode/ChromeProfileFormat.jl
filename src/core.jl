@@ -189,14 +189,6 @@ function CPUProfile(data::Union{Nothing, Vector{UInt}} = nothing,
     return CPUProfile(nodes, start_time, start_time + sum(timeDeltas), samples, timeDeltas) 
 end
 
-function save_cpuprofile(filename::AbstractString, data::Union{Nothing, Vector{UInt}} = nothing,
-    period::Union{Nothing, UInt64} = nothing; kwargs...)
-
-    open(filename, "w") do io
-        save_cpuprofile(io, data, period; kwargs...)
-    end
-end
-
 function save_cpuprofile(io::IO, data::Union{Nothing, Vector{UInt}} = nothing,
                          period::Union{Nothing, UInt64} = nothing; kwargs...)
 
@@ -281,4 +273,12 @@ function save_cpuprofile(io::IO, data::Union{Nothing, Vector{UInt}} = nothing,
     JSON.print(io, profile.timeDeltas)
     write(io, '}')
     nothing
+end
+
+function save_cpuprofile(filename::AbstractString, data::Union{Nothing, Vector{UInt}} = nothing,
+    period::Union{Nothing, UInt64} = nothing; kwargs...)
+
+    open(filename, "w") do io
+        save_cpuprofile(io, data, period; kwargs...)
+    end
 end
