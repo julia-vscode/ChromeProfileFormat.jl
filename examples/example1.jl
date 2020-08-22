@@ -10,4 +10,4 @@ foo()
 Profile.clear()
 @profile foo()
 
-ChromeProfileFormat.save_cpuprofile("test.cpuprofile", from_c = true)
+ChromeProfileFormat.save_cpuprofile("test.cpuprofile", from_c=true)
