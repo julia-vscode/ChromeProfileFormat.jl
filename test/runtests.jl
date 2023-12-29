@@ -1,4 +1,3 @@
 using Test
 
-@testset "ChromeProfileFormat" begin
-end
+@testset "ChromeProfileFormat" begin end
