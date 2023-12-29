@@ -20,13 +20,13 @@ is a callee and the `positionTicks` represents the location.
 mutable struct ProfileNode
     id::Int64
     callFrame::CallFrame
-    hitCount::Int64 
+    hitCount::Int64
     children::Vector{Int64}
     positionTicks::Vector{PositionTickInfo}
 end
 
 function enter!(node::ProfileNode, line)
-    idx = findfirst(tick->tick.line == line, node.positionTicks)
+    idx = findfirst(tick -> tick.line == line, node.positionTicks)
     if idx === nothing
         push!(node.positionTicks, PositionTickInfo(line, 1))
     else
@@ -53,11 +53,11 @@ Fetches the collected `Profile` data.
 - `period::UInt64`: The sampling period in nanoseconds [optional].
 """
 
-function CPUProfile(data::Union{Nothing, Vector{UInt}} = nothing,
-                    period::Union{Nothing, UInt64} = nothing; from_c = false)
+function CPUProfile(data::Union{Nothing,Vector{UInt}}=nothing,
+    period::Union{Nothing,UInt64}=nothing; from_c=false)
     if data === nothing
         data = if isdefined(Profile, :has_meta)
-            copy(Profile.fetch(include_meta = false))
+            copy(Profile.fetch(include_meta=false))
         else
             copy(Profile.fetch())
         end
@@ -71,7 +71,7 @@ function CPUProfile(data::Union{Nothing, Vector{UInt}} = nothing,
 
     period = period ÷ 1000 # ns to ms
 
-    methods = Dict{Tuple{String, Int64}, CallFrame}()
+    methods = Dict{Tuple{String,Int64},CallFrame}()
     function get_callframe!(url, start_line, name, file)
         get!(methods, (url, start_line)) do
             CallFrame(name, file, url, start_line, 0)
@@ -85,8 +85,8 @@ function CPUProfile(data::Union{Nothing, Vector{UInt}} = nothing,
         return node
     end
 
-    samples    = Int64[] #  Ids of samples leaf.
-    toplevel   = Set{Int64}() #  Ids of samples top nodes.
+    samples = Int64[] #  Ids of samples leaf.
+    toplevel = Set{Int64}() #  Ids of samples top nodes.
     timeDeltas = Int64[] # Time intervals between adjacent samples in microseconds. The first delta is relative to the profile startTime.
 
     # start decoding backtraces
@@ -138,9 +138,9 @@ function CPUProfile(data::Union{Nothing, Vector{UInt}} = nothing,
                     # TODO: stackframes.jl describes this as a top-level frame
                     linfo = frame.linfo.parent::Core.MethodInstance
                 end
-                meth       = linfo.def
-                file       = string(meth.file)
-                name       = string(meth.module, ".", meth.name)
+                meth = linfo.def
+                file = string(meth.file)
+                name = string(meth.module, ".", meth.name)
                 start_line = convert(Int64, meth.line)
             end
             # TODO: Deal with unkown or unresolved functions
@@ -192,11 +192,11 @@ function CPUProfile(data::Union{Nothing, Vector{UInt}} = nothing,
     start_time = 0
     timeDeltas[1] = 0
     @assert length(timeDeltas) == length(samples)
-    return CPUProfile(nodes, start_time, start_time + sum(timeDeltas), samples, timeDeltas) 
+    return CPUProfile(nodes, start_time, start_time + sum(timeDeltas), samples, timeDeltas)
 end
 
-function save_cpuprofile(io::IO, data::Union{Nothing, Vector{UInt}} = nothing,
-                         period::Union{Nothing, UInt64} = nothing; kwargs...)
+function save_cpuprofile(io::IO, data::Union{Nothing,Vector{UInt}}=nothing,
+    period::Union{Nothing,UInt64}=nothing; kwargs...)
 
     profile = CPUProfile(data, period; kwargs...)
     write(io, '{')
@@ -212,25 +212,25 @@ function save_cpuprofile(io::IO, data::Union{Nothing, Vector{UInt}} = nothing,
         JSON.print(io, "callFrame")
         write(io, ':')
         write(io, '{')
-            JSON.print(io, "functionName")
-            write(io, ':')
-            JSON.print(io, node.callFrame.functionName)
-            write(io, ',')
-            JSON.print(io, "scriptId")
-            write(io, ':')
-            JSON.print(io, node.callFrame.scriptId)
-            write(io, ',')
-            JSON.print(io, "url")
-            write(io, ':')
-            JSON.print(io, node.callFrame.url)
-            write(io, ',')
-            JSON.print(io, "lineNumber")
-            write(io, ':')
-            JSON.print(io, node.callFrame.lineNumber)
-            write(io, ',')
-            JSON.print(io, "columnNumber")
-            write(io, ':')
-            JSON.print(io, node.callFrame.columnNumber)
+        JSON.print(io, "functionName")
+        write(io, ':')
+        JSON.print(io, node.callFrame.functionName)
+        write(io, ',')
+        JSON.print(io, "scriptId")
+        write(io, ':')
+        JSON.print(io, node.callFrame.scriptId)
+        write(io, ',')
+        JSON.print(io, "url")
+        write(io, ':')
+        JSON.print(io, node.callFrame.url)
+        write(io, ',')
+        JSON.print(io, "lineNumber")
+        write(io, ':')
+        JSON.print(io, node.callFrame.lineNumber)
+        write(io, ',')
+        JSON.print(io, "columnNumber")
+        write(io, ':')
+        JSON.print(io, node.callFrame.columnNumber)
         write(io, '}')
         write(io, ',')
         JSON.print(io, "hitCount")
@@ -281,8 +281,8 @@ function save_cpuprofile(io::IO, data::Union{Nothing, Vector{UInt}} = nothing,
     nothing
 end
 
-function save_cpuprofile(filename::AbstractString, data::Union{Nothing, Vector{UInt}} = nothing,
-    period::Union{Nothing, UInt64} = nothing; kwargs...)
+function save_cpuprofile(filename::AbstractString, data::Union{Nothing,Vector{UInt}}=nothing,
+    period::Union{Nothing,UInt64}=nothing; kwargs...)
 
     open(filename, "w") do io
         save_cpuprofile(io, data, period; kwargs...)
